@@ -4,36 +4,32 @@ https://github.com/microsoft/TypeScript/issues/50647#issuecomment-1245994280
 
 Steps to reproduce:
 
-1) Build with TS 4.7.4
-
 ```shell
 npm i
 npm run build
-cat dist/config.cjs
+cat dist/index.js
 ```
 
-TS 4.7.4 produces valid JavaScript:
+- config.cjs compiles to CJS - OK
+- index.ts compiles to CJS - FAIL
 
-```javascript
-"use strict";
-module.exports = {
-    "some": "stuff"
-};
-```
-
-2) Build with TS 4.8.4
+Change `moduleResolution` to `NodeNext` in `tsconfig.json` and try compiling again.
 
 ```shell
-npm i -D --save-exact typescript@4.8.4 
 npm run build
-cat dist/config.cjs
 ```
 
-TS 4.8.4 produces **invalid** JavaScript:
+Compilation fails with the following error:
 
-```javascript
-module.exports = {
-    "some": "stuff"
-};
-export {};
+```shell
+src/index.ts:3:43 - error TS2349: This expression is not callable.
+  Type 'typeof import("[REDACTED]/sandbox/node_modules/clsx/clsx")' has no call signatures.
+
+3 export const foo = (className: string) => clsx(className);
+                                            ~~~~
+
+
+Found 1 error in src/index.ts:3
+
+ERROR: "build:js" exited with 2.
 ```
